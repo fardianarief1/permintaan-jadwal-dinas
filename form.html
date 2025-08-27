@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Form Jadwal</title>
+</head>
+<body>
+  <form id="jadwalForm">
+    <label>Nama:</label><br>
+    <input type="text" name="nama" required><br>
+
+    <label>NIK:</label><br>
+    <input type="text" name="nik" required><br>
+
+    <label>Ruangan:</label><br>
+    <input type="text" name="ruangan" required><br>
+
+    <label>Tanggal:</label><br>
+    <input type="date" name="tanggal" required><br>
+
+    <label>Jadwal:</label><br>
+    <input type="text" name="jadwal" required><br>
+
+    <label>Alasan:</label><br>
+    <textarea name="alasan" required></textarea><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="result"></p>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPnvV4Fc0GvQudfZwe1vh2hJWjbA6Zt68BGLzx5XRlC9JRYi_4HVEZLq-4Qhu7JiDvHQ/exec";
+
+    document.getElementById("jadwalForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        nama: e.target.nama.value,
+        nik: e.target.nik.value,
+        ruangan: e.target.ruangan.value,
+        dates: [
+          { tanggal: e.target.tanggal.value, jadwal: e.target.jadwal.value }
+        ],
+        alasan: e.target.alasan.value
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" }
+        });
+        const result = await res.json();
+        document.getElementById("result").innerText = result.message;
+        e.target.reset();
+      } catch (err) {
+        document.getElementById("result").innerText = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
