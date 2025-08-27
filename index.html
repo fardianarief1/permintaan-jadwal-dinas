@@ -2,97 +2,136 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Jadwal</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Form Permintaan</title>
   <style>
     body {
-      background: #f4f7fa;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+    }
+    .container {
+      background: white;
       padding: 20px;
-    }
-    .card {
-      max-width: 500px;
-      width: 100%;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .btn-primary {
       border-radius: 12px;
-      padding: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
     }
-    textarea {
-      resize: none;
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #374151;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+      color: #374151;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    .add-btn {
+      background: #10b981;
+      margin-top: 8px;
+    }
+    .add-btn:hover {
+      background: #059669;
+    }
+    button {
+      margin-top: 15px;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .success {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #dcfce7;
+      color: #166534;
+      display: none;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="card p-4">
-    <h4 class="text-center mb-4">Form Input Jadwal</h4>
-    <form id="jadwalForm">
-      <div class="mb-3">
-        <label class="form-label">Nama</label>
-        <input type="text" class="form-control" name="nama" required>
+  <div class="container">
+    <h2>Form Permintaan</h2>
+    <form id="permintaanForm">
+      <label>Nama</label>
+      <input type="text" name="nama" required>
+
+      <label>NIK Karyawan</label>
+      <input type="text" name="nik" required>
+
+      <label>Ruangan</label>
+      <input type="text" name="ruangan" required>
+
+      <div id="tanggalContainer">
+        <label>Tanggal Permintaan</label>
+        <input type="date" name="tanggal[]" required>
       </div>
-      <div class="mb-3">
-        <label class="form-label">NIK</label>
-        <input type="text" class="form-control" name="nik" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Ruangan</label>
-        <input type="text" class="form-control" name="ruangan" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Tanggal</label>
-        <input type="date" class="form-control" name="tanggal" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Jadwal</label>
-        <input type="text" class="form-control" name="jadwal" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Alasan</label>
-        <textarea class="form-control" rows="3" name="alasan" required></textarea>
-      </div>
-      <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
+      <button type="button" class="add-btn" onclick="tambahTanggal()">+ Tambah Tanggal</button>
+
+      <label>Jadwal Permintaan</label>
+      <select name="jadwal" required>
+        <option value="">-- Pilih Jadwal --</option>
+        <option value="Pagi">Pagi</option>
+        <option value="Siang">Siang</option>
+        <option value="Malam">Malam</option>
+      </select>
+
+      <label>Alasan</label>
+      <textarea name="alasan" required></textarea>
+
+      <button type="submit">Submit</button>
+      <div class="success" id="successMsg">✅ Data berhasil dikirim!</div>
     </form>
-    <p id="result" class="text-center mt-3 text-muted"></p>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPnvV4Fc0GvQudfZwe1vh2hJWjbA6Zt68BGLzx5XRlC9JRYi_4HVEZLq-4Qhu7JiDvHQ/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwPnvV4Fc0GvQudfZwe1vh2hJWjbA6Zt68BGLzx5XRlC9JRYi_4HVEZLq-4Qhu7JiDvHQ/exec";
+    const form = document.getElementById("permintaanForm");
+    const successMsg = document.getElementById("successMsg");
 
-    document.getElementById("jadwalForm").addEventListener("submit", async (e) => {
+    function tambahTanggal() {
+      const container = document.getElementById("tanggalContainer");
+      const input = document.createElement("input");
+      input.type = "date";
+      input.name = "tanggal[]";
+      input.required = true;
+      input.style.marginTop = "6px";
+      container.appendChild(input);
+    }
+
+    form.addEventListener("submit", e => {
       e.preventDefault();
-
-      const formData = {
-        nama: e.target.nama.value,
-        nik: e.target.nik.value,
-        ruangan: e.target.ruangan.value,
-        dates: [
-          { tanggal: e.target.tanggal.value, jadwal: e.target.jadwal.value }
-        ],
-        alasan: e.target.alasan.value
-      };
-
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: { "Content-Type": "application/json" }
-        });
-        const result = await res.json();
-        document.getElementById("result").innerText = result.message;
-        e.target.reset();
-      } catch (err) {
-        document.getElementById("result").innerText = "Error: " + err.message;
-      }
+      fetch(scriptURL, {
+        method: "POST",
+        body: new FormData(form)
+      })
+      .then(() => {
+        successMsg.style.display = "block";
+        form.reset();
+        document.getElementById("tanggalContainer").innerHTML =
+          '<label>Tanggal Permintaan</label><input type="date" name="tanggal[]" required>';
+      })
+      .catch(err => alert("Gagal mengirim data: " + err.message));
     });
   </script>
 </body>
